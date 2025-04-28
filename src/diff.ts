@@ -59,10 +59,16 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
 
       if (oldYaml !== newYaml) {
         const ns = getNamespace(newRes);
-        const diffText = diffLines(oldYaml, newYaml)
+        const diffParts = diffLines(oldYaml, newYaml);
+
+        const diffText = diffParts
           .map((part) => {
             const prefix = part.added ? '+' : part.removed ? '-' : ' ';
-            return part.value.split('\n').map(line => line && `${prefix} ${line}`).join('\n');
+            return part.value
+              .split('\n')
+              .filter(line => line.length > 0)
+              .map(line => `${prefix} ${line}`)
+              .join('\n');
           })
           .join('\n');
 

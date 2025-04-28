@@ -1,8 +1,9 @@
-# Identical resource
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: simple-config
+  name: my-config
   namespace: default
+  labels:
+    app: my-app
 data:
-  key: value2
+  key: old-value

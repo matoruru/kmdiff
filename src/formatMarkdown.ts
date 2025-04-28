@@ -1,4 +1,4 @@
-import type{ DiffResult } from './types';
+import type { DiffResult } from './types';
 
 /**
  * Format DiffResult into a human-readable Markdown string.
@@ -6,15 +6,21 @@ import type{ DiffResult } from './types';
 export const formatMarkdown = (diffResult: DiffResult): string => {
   return diffResult
     .map(({ namespace, diffs }) => {
-      const kinds = diffs.reduce<Record<string, { type: string; name: string }[]>>((acc, diff) => ({
+      const kinds = diffs.reduce<Record<string, { type: string; name: string; diffText?: string }[]>>((acc, diff) => ({
         ...acc,
-        [diff.kind]: [...(acc[diff.kind] || []), { type: diff.type, name: diff.name }],
+        [diff.kind]: [...(acc[diff.kind] || []), { type: diff.type, name: diff.name, diffText: diff.diffText }],
       }), {});
 
       const kindSections = Object.entries(kinds)
         .map(([kind, resources]) => {
           const items = resources
-            .map((res) => `- ${capitalize(res.type)}: ${res.name}`)
+            .map((res) => {
+              const header = `- ${capitalize(res.type)}: ${res.name}`;
+              const diffBlock = res.type === 'modified' && res.diffText
+                ? `\n\n\`\`\`diff\n${res.diffText.trim()}\n\`\`\`\n`
+                : '';
+              return header + diffBlock;
+            })
             .join('\n');
           return `## ${kind}\n\n${items}`;
         })

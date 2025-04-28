@@ -13,7 +13,7 @@ export const K8sResourceSchema = z.object({
   metadata: z.object({
     name: z.string(),
     namespace: z.string().optional(),
-  }),
+  }).passthrough(),
 }).passthrough();
 
 export type K8sResource = z.infer<typeof K8sResourceSchema>;

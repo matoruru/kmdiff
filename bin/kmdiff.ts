@@ -4,22 +4,9 @@ import sade from 'sade';
 import pkg from '../package.json' assert { type: 'json' };
 import { diffResources } from '../src/diff';
 import { formatMarkdown } from '../src/formatMarkdown';
-import { K8sResourceSchema } from '../src/types';
 import * as fs from 'fs/promises';
-import * as YAML from 'yaml';
 import { printBanner } from '../src/banner';
-
-/**
- * Parse YAML content into K8sResource array
- */
-const parseYaml = (content: string) => {
-  const docs = content.split(/^---\s*$/gm)
-    .map(doc => doc.trim())
-    .filter(doc => doc.length > 0)
-    .map(doc => YAML.parse(doc));
-  
-  return K8sResourceSchema.array().parse(docs);
-};
+import { parseYaml } from '../src/utils';
 
 const prog = sade('kmdiff [oldFile] [newFile]')
   .version(pkg.version)

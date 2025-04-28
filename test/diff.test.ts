@@ -108,11 +108,16 @@ describe('diffResources', () => {
             kind: 'ConfigMap',
             name: 'my-config',
             type: 'modified',
-            diffText: expect.any(String), // Should contain the actual diff text
+            diffText: expect.any(String),
           },
         ],
       },
     ]);
+
+    const diffText = result[0]?.diffs[0]?.diffText;
+    expect(diffText).toBeDefined();
+    expect(diffText).not.toEqual('');
+    expect(diffText).toContain('key');
   });
 
   it('sorts diffs by namespace, kind, and name', () => {
