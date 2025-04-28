@@ -3,7 +3,7 @@ import { $ } from 'bun';
 import * as path from 'path';
 
 describe('kmdiff CLI', () => {
-  const cliPath = path.resolve(__dirname, '../src/cli.ts');
+  const cliPath = path.resolve(__dirname, '../bin/kmdiff.ts');
 
   it('prints correct diff when resources are changed, added, and removed', async () => {
     const oldYaml = path.resolve(__dirname, 'fixtures/change-add-remove-old.yaml');
@@ -48,9 +48,13 @@ describe('kmdiff CLI', () => {
 
   it('shows usage message when arguments are missing', async () => {
     const proc = await $`bun ${cliPath}`.nothrow().quiet();
-    const stderr = proc.stderr.toString('utf8');
+    const stdout = proc.stdout.toString('utf8');
 
-    expect(stderr).toContain('Usage: kmdiff <old.yaml> <new.yaml>');
+    expect(stdout).toContain('Description');
+    expect(stdout).toContain('Usage');
+    expect(stdout).toContain('Options');
+    expect(stdout).toContain('Examples');
     expect(proc.exitCode).toBe(1);
   });
+
 });

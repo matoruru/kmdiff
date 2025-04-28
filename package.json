@@ -2,6 +2,9 @@
   "name": "kmdiff",
   "module": "index.ts",
   "version": "0.1.0",
+  "bin": {
+    "kmdiff": "./bin/kmdiff.ts"
+  },
   "type": "module",
   "private": true,
   "scripts": {
