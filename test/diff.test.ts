@@ -114,6 +114,10 @@ describe('diffResources', () => {
       },
     ]);
 
+    if (result[0]?.diffs[0]?.type !== 'modified') {
+      throw new Error('modified resource was expected here.');
+    }
+
     const diffText = result[0]?.diffs[0]?.diffText;
     expect(diffText).toBeDefined();
     expect(diffText).not.toEqual('');

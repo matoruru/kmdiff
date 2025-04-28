@@ -4,12 +4,25 @@ import type { DiffResult } from '../src/types';
 
 describe('formatMarkdown', () => {
   it('formats DiffResult into Markdown summary', () => {
+    const diffText = `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: your-config
+  namespace: default
+  labels:
+-     app: my-app
++     app: my-app2
+  data:
+-   key: old-value
++   key: new-value`.replace(/^\n/, '');
+
     const diffResult: DiffResult = [
       {
         namespace: 'default',
         diffs: [
           { kind: 'ConfigMap', name: 'my-config', type: 'added' },
-          { kind: 'ConfigMap', name: 'your-config', type: 'modified' },
+          { kind: 'ConfigMap', name: 'your-config', type: 'modified', diffText },
           { kind: 'Service', name: 'my-service', type: 'removed' },
         ],
       },
@@ -22,6 +35,10 @@ describe('formatMarkdown', () => {
 
 - Added: my-config
 - Modified: your-config
+
+\`\`\`diff
+${diffText}
+\`\`\`
 
 ## Service
 

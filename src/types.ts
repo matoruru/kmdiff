@@ -18,19 +18,26 @@ export const K8sResourceSchema = z.object({
 
 export type K8sResource = z.infer<typeof K8sResourceSchema>;
 
+const BaseResourceDiffSchema = z.object({
+  kind: z.string(),
+  name: z.string(),
+});
+
 /**
  * Resource diff schema
  */
-export const ResourceDiffSchema = z.object({
-  kind: z.string(),
-  name: z.string(),
-  type: z.union([
-    z.literal('added'),
-    z.literal('removed'),
-    z.literal('modified'),
-  ]),
-  diffText: z.string().optional(),
-});
+export const ResourceDiffSchema = z.discriminatedUnion('type', [
+  BaseResourceDiffSchema.extend({
+    type: z.literal('added'),
+  }),
+  BaseResourceDiffSchema.extend({
+    type: z.literal('removed'),
+  }),
+  BaseResourceDiffSchema.extend({
+    type: z.literal('modified'),
+    diffText: z.string(),
+  }),
+]);
 
 export type ResourceDiff = z.infer<typeof ResourceDiffSchema>;
 
