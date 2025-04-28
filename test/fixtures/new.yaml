@@ -1,0 +1,26 @@
+# New version
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unchanged-config
+  namespace: default
+data:
+  key: value
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modified-config
+  namespace: default
+data:
+  key: new-value
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: added-service
+  namespace: default
+spec:
+  type: LoadBalancer

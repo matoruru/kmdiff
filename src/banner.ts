@@ -1,4 +1,4 @@
-export const banner = `
+const banner = `
          __      ___ ______
   __ _  / /_____/ (_) _/ _/
  /  ' \\/  '_/ _  / / _/ _/ 
@@ -6,3 +6,7 @@ export const banner = `
 
 kmdiff - Kubernetes Manifest Diff
 `.replace(/^\n/, '');
+
+export const printBanner = (): void => {
+  console.log(banner);
+};
