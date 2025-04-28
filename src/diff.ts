@@ -17,31 +17,40 @@ export const createResourceMap = (resources: K8sResource[]): Map<string, K8sReso
 };
 
 /**
- * Generate a list of resource diffs (added, removed, modified) from old and new resource maps.
+ * Generate DiffResult directly from old and new resource maps.
+ * Diffs are grouped by namespace immediately.
  */
-export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: Map<string, K8sResource>): ResourceDiff[] => {
+export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: Map<string, K8sResource>): DiffResult => {
   const allKeys = new Set([...oldMap.keys(), ...newMap.keys()]);
 
-  return Array.from(allKeys).flatMap<ResourceDiff>((key) => {
+  const namespaceMap = new Map<string, ResourceDiff[]>();
+
+  for (const key of allKeys) {
     const oldRes = oldMap.get(key);
     const newRes = newMap.get(key);
 
     if (oldRes && !newRes) {
-      return [{
-        namespace: getNamespace(oldRes),
-        kind: oldRes.kind,
-        name: oldRes.metadata.name,
-        type: 'removed' as const,
-      }];
+      const ns = getNamespace(oldRes);
+      namespaceMap.set(ns, [
+        ...(namespaceMap.get(ns) ?? []),
+        {
+          kind: oldRes.kind,
+          name: oldRes.metadata.name,
+          type: 'removed' as const,
+        }
+      ]);
     }
 
     if (!oldRes && newRes) {
-      return [{
-        namespace: getNamespace(newRes),
-        kind: newRes.kind,
-        name: newRes.metadata.name,
-        type: 'added' as const,
-      }];
+      const ns = getNamespace(newRes);
+      namespaceMap.set(ns, [
+        ...(namespaceMap.get(ns) ?? []),
+        {
+          kind: newRes.kind,
+          name: newRes.metadata.name,
+          type: 'added' as const,
+        }
+      ]);
     }
 
     if (oldRes && newRes) {
@@ -49,46 +58,35 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
       const newYaml = YAML.stringify(newRes);
 
       if (oldYaml !== newYaml) {
-        const diff = diffLines(oldYaml, newYaml)
+        const ns = getNamespace(newRes);
+        const diffText = diffLines(oldYaml, newYaml)
           .map((part) => {
             const prefix = part.added ? '+' : part.removed ? '-' : ' ';
             return part.value.split('\n').map(line => line && `${prefix} ${line}`).join('\n');
           })
           .join('\n');
 
-        return [{
-          namespace: getNamespace(newRes),
-          kind: newRes.kind,
-          name: newRes.metadata.name,
-          type: 'modified' as const,
-          diffText: diff,
-        }];
+        namespaceMap.set(ns, [
+          ...(namespaceMap.get(ns) ?? []),
+          {
+            kind: newRes.kind,
+            name: newRes.metadata.name,
+            type: 'modified' as const,
+            diffText,
+          }
+        ]);
       }
     }
+  }
 
-    return [];
-  });
+  return Array.from(namespaceMap.entries()).map(([namespace, diffs]) => ({
+    namespace,
+    diffs,
+  }));
 };
 
 const getResourceKey = (resource: K8sResource): string => {
   return `${getNamespace(resource)}/${resource.kind}/${resource.metadata.name}`;
-};
-
-/**
- * Group resource diffs by their namespace.
- */
-export const groupByNamespace = (diffs: ResourceDiff[]): DiffResult => {
-  const namespaceMap = diffs.reduce<Record<string, ResourceDiff[]>>((acc, diff) => {
-    return {
-      ...acc,
-      [diff.namespace]: [...(acc[diff.namespace] || []), diff],
-    };
-  }, {});
-
-  return Object.entries(namespaceMap).map(([namespace, diffs]) => ({
-    namespace,
-    diffs,
-  }));
 };
 
 /**
@@ -116,9 +114,6 @@ export const diffResources = (oldResources: K8sResource[], newResources: K8sReso
   const oldMap = createResourceMap(oldResources);
   const newMap = createResourceMap(newResources);
 
-  const allDiffs = generateResourceDiff(oldMap, newMap);
-
-  const grouped = groupByNamespace(allDiffs);
-
-  return sortDiffResult(grouped);
+  const unsorted = generateResourceDiff(oldMap, newMap);
+  return sortDiffResult(unsorted);
 };

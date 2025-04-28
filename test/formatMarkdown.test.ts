@@ -8,9 +8,9 @@ describe('formatMarkdown', () => {
       {
         namespace: 'default',
         diffs: [
-          { namespace: 'default', kind: 'ConfigMap', name: 'my-config', type: 'added' },
-          { namespace: 'default', kind: 'ConfigMap', name: 'your-config', type: 'modified' },
-          { namespace: 'default', kind: 'Service', name: 'my-service', type: 'removed' },
+          { kind: 'ConfigMap', name: 'my-config', type: 'added' },
+          { kind: 'ConfigMap', name: 'your-config', type: 'modified' },
+          { kind: 'Service', name: 'my-service', type: 'removed' },
         ],
       },
     ];
