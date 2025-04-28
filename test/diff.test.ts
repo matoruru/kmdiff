@@ -1,6 +1,6 @@
 // test/diff.test.ts
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import { diffResources } from '../src/diff';
 import type { K8sResource } from '../src/types';
 
