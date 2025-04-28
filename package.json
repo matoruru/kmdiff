@@ -10,6 +10,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/diff": "^7.0.2",
+    "@types/sade": "^1.8.0",
     "typescript": "^5"
   },
   "peerDependencies": {
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "diff": "^7.0.0",
+    "sade": "^1.8.1",
     "yaml": "^2.7.1",
     "zod": "^3.24.3"
   }
