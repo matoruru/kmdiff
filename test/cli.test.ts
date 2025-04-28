@@ -57,6 +57,17 @@ describe('kmdiff CLI', () => {
     expect(proc.exitCode).toBe(1);
   });
 
+  it('show usage message when unknown option is given', async () => {
+    const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml --unknown`.nothrow().quiet();
+    const stdout = proc.stdout.toString('utf8');
+
+    expect(stdout).toContain('Description');
+    expect(stdout).toContain('Usage');
+    expect(stdout).toContain('Options');
+    expect(stdout).toContain('Examples');
+    expect(proc.exitCode).toBe(1);
+  });
+
   it('shows banner when diffs exist', async () => {
     const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.quiet();
     const stdout = proc.stdout.toString('utf8');

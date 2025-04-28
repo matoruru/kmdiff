@@ -7,6 +7,7 @@ import { formatMarkdown } from '../src/formatMarkdown';
 import * as fs from 'fs/promises';
 import { printBanner } from '../src/banner';
 import { parseYaml } from '../src/utils';
+import { getUnknownOptions } from '../src/hack/sade-internals';
 
 const prog = sade('kmdiff [oldFile] [newFile]')
   .version(pkg.version)
@@ -15,7 +16,9 @@ const prog = sade('kmdiff [oldFile] [newFile]')
   .example('kmdiff old.yaml new.yaml')
   .example('kmdiff old.yaml new.yaml --json')
   .action(async (oldFile, newFile, opts) => {
-    if (!oldFile || !newFile) {
+    const unknownOptions = getUnknownOptions(prog, opts);
+
+    if ((!oldFile || !newFile) || unknownOptions.length > 0) {
       prog.help();
       process.exit(1);
     }
