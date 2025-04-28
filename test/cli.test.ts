@@ -57,4 +57,35 @@ describe('kmdiff CLI', () => {
     expect(proc.exitCode).toBe(1);
   });
 
+  it('shows banner when diffs exist', async () => {
+    const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.quiet();
+    const stdout = proc.stdout.toString('utf8');
+
+    // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
+    expect(stdout).toContain('kmdiff - Kubernetes Manifest Diff');
+  });
+
+  it('shows banner when no diffs exist', async () => {
+    const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.quiet();
+    const stdout = proc.stdout.toString('utf8');
+
+    // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
+    expect(stdout).toContain('kmdiff - Kubernetes Manifest Diff');
+  });
+
+  it('shows banner even when file read error occurs', async () => {
+    const proc = await $`bun ${cliPath} test/fixtures/nonexistent-old.yaml test/fixtures/nonexistent-new.yaml`.nothrow().quiet();
+    const stdout = proc.stdout.toString('utf8');
+
+    // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
+    expect(stdout).toContain('kmdiff - Kubernetes Manifest Diff');
+  });
+
+  it('does not print banner when --help is called', async () => {
+    const proc = await $`bun ${cliPath} --help`.quiet();
+    const stdout = proc.stdout.toString('utf8');
+
+    // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
+    expect(stdout).not.toContain('kmdiff - Kubernetes Manifest Diff');
+  });
 });

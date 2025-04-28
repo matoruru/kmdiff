@@ -1,0 +1,8 @@
+# Identical resource
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-config
+  namespace: default
+data:
+  key: value1
