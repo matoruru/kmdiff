@@ -115,4 +115,53 @@ describe('diffResources', () => {
     ]);
   });
 
+  it('sorts diffs by namespace, kind, and name', () => {
+    const oldResources: K8sResource[] = [];
+    const newResources: K8sResource[] = [
+      {
+        apiVersion: 'v1',
+        kind: 'Service',
+        metadata: { name: 'b-service', namespace: 'bbb' },
+      },
+      {
+        apiVersion: 'v1',
+        kind: 'Service',
+        metadata: { name: 'a-service', namespace: 'aaa' },
+      },
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: { name: 'z-config', namespace: 'aaa' },
+      },
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: { name: 'a-config', namespace: 'aaa' },
+      },
+    ];
+  
+    // Expect the diffs to be sorted:
+    // - first by namespace (aaa, then bbb)
+    // - then by kind (ConfigMap before Service)
+    // - then by name (a-config before z-config)
+    const result = diffResources(oldResources, newResources);
+  
+    expect(result).toEqual([
+      {
+        namespace: 'aaa',
+        diffs: [
+          { kind: 'ConfigMap', name: 'a-config', type: 'added' },
+          { kind: 'ConfigMap', name: 'z-config', type: 'added' },
+          { kind: 'Service', name: 'a-service', type: 'added' },
+        ],
+      },
+      {
+        namespace: 'bbb',
+        diffs: [
+          { kind: 'Service', name: 'b-service', type: 'added' },
+        ],
+      },
+    ]);
+  });
+
 });

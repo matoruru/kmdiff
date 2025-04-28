@@ -84,6 +84,24 @@ export const groupByNamespace = (diffs: ResourceDiff[], resources: K8sResource[]
 };
 
 /**
+ * Sort DiffResult by namespace, kind, and resource name.
+ */
+export const sortDiffResult = (diffResult: DiffResult): DiffResult => {
+  return diffResult
+    .slice()
+    .sort((a, b) => a.namespace.localeCompare(b.namespace))
+    .map(({ namespace, diffs }) => ({
+      namespace,
+      diffs: diffs
+        .slice()
+        .sort((a, b) => {
+          if (a.kind !== b.kind) return a.kind.localeCompare(b.kind);
+          return a.name.localeCompare(b.name);
+        }),
+    }));
+};
+
+/**
  * Find namespace for a given resource.
  */
 const findNamespace = (kind: string, name: string, resources: K8sResource[]): string | undefined => {
@@ -96,5 +114,7 @@ export const diffResources = (oldResources: K8sResource[], newResources: K8sReso
 
   const allDiffs = generateResourceDiff(oldMap, newMap);
 
-  return groupByNamespace(allDiffs, [...newResources, ...oldResources]);
+  const grouped = groupByNamespace(allDiffs, [...newResources, ...oldResources]);
+
+  return sortDiffResult(grouped);
 };
