@@ -28,6 +28,7 @@ describe('diffResources', () => {
         namespace: 'default',
         diffs: [
           {
+            namespace: 'default',
             kind: 'ConfigMap',
             name: 'my-config',
             type: 'added',
@@ -61,6 +62,7 @@ describe('diffResources', () => {
         namespace: 'default',
         diffs: [
           {
+            namespace: 'default',
             kind: 'ConfigMap',
             name: 'old-config',
             type: 'removed',
@@ -105,6 +107,7 @@ describe('diffResources', () => {
         namespace: 'default',
         diffs: [
           {
+            namespace: 'default',
             kind: 'ConfigMap',
             name: 'my-config',
             type: 'modified',
@@ -150,15 +153,15 @@ describe('diffResources', () => {
       {
         namespace: 'aaa',
         diffs: [
-          { kind: 'ConfigMap', name: 'a-config', type: 'added' },
-          { kind: 'ConfigMap', name: 'z-config', type: 'added' },
-          { kind: 'Service', name: 'a-service', type: 'added' },
+          { namespace: 'aaa', kind: 'ConfigMap', name: 'a-config', type: 'added' },
+          { namespace: 'aaa', kind: 'ConfigMap', name: 'z-config', type: 'added' },
+          { namespace: 'aaa', kind: 'Service', name: 'a-service', type: 'added' },
         ],
       },
       {
         namespace: 'bbb',
         diffs: [
-          { kind: 'Service', name: 'b-service', type: 'added' },
+          { namespace: 'bbb', kind: 'Service', name: 'b-service', type: 'added' },
         ],
       },
     ]);

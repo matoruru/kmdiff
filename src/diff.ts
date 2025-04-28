@@ -3,6 +3,13 @@ import { diffLines } from 'diff';
 import * as YAML from 'yaml';
 
 /**
+ * Safely get namespace from a K8sResource, defaulting to 'default' if missing.
+ */
+const getNamespace = (resource: K8sResource): string => {
+  return resource.metadata.namespace ?? 'default';
+};
+
+/**
  * Create a Map from an array of K8sResource, keyed by namespace/kind/name.
  */
 export const createResourceMap = (resources: K8sResource[]): Map<string, K8sResource> => {
@@ -21,6 +28,7 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
 
     if (oldRes && !newRes) {
       return [{
+        namespace: getNamespace(oldRes),
         kind: oldRes.kind,
         name: oldRes.metadata.name,
         type: 'removed' as const,
@@ -29,6 +37,7 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
 
     if (!oldRes && newRes) {
       return [{
+        namespace: getNamespace(newRes),
         kind: newRes.kind,
         name: newRes.metadata.name,
         type: 'added' as const,
@@ -48,6 +57,7 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
           .join('\n');
 
         return [{
+          namespace: getNamespace(newRes),
           kind: newRes.kind,
           name: newRes.metadata.name,
           type: 'modified' as const,
@@ -61,19 +71,17 @@ export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: M
 };
 
 const getResourceKey = (resource: K8sResource): string => {
-  const namespace = resource.metadata.namespace || 'default';
-  return `${namespace}/${resource.kind}/${resource.metadata.name}`;
+  return `${getNamespace(resource)}/${resource.kind}/${resource.metadata.name}`;
 };
 
 /**
  * Group resource diffs by their namespace.
  */
-export const groupByNamespace = (diffs: ResourceDiff[], resources: K8sResource[]): DiffResult => {
+export const groupByNamespace = (diffs: ResourceDiff[]): DiffResult => {
   const namespaceMap = diffs.reduce<Record<string, ResourceDiff[]>>((acc, diff) => {
-    const namespace = findNamespace(diff.kind, diff.name, resources) || 'default';
     return {
       ...acc,
-      [namespace]: [...(acc[namespace] || []), diff],
+      [diff.namespace]: [...(acc[diff.namespace] || []), diff],
     };
   }, {});
 
@@ -102,19 +110,15 @@ export const sortDiffResult = (diffResult: DiffResult): DiffResult => {
 };
 
 /**
- * Find namespace for a given resource.
+ * Main function to generate sorted diff results from old and new resource arrays.
  */
-const findNamespace = (kind: string, name: string, resources: K8sResource[]): string | undefined => {
-  return resources.find((r) => r.kind === kind && r.metadata.name === name)?.metadata.namespace;
-};
-
 export const diffResources = (oldResources: K8sResource[], newResources: K8sResource[]): DiffResult => {
   const oldMap = createResourceMap(oldResources);
   const newMap = createResourceMap(newResources);
 
   const allDiffs = generateResourceDiff(oldMap, newMap);
 
-  const grouped = groupByNamespace(allDiffs, [...newResources, ...oldResources]);
+  const grouped = groupByNamespace(allDiffs);
 
   return sortDiffResult(grouped);
 };

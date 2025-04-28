@@ -1,0 +1,8 @@
+# New resource in "prod" namespace
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ns-config
+  namespace: prod
+data:
+  key: value

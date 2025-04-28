@@ -1,0 +1,8 @@
+# Identical resource
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: same-config
+  namespace: default
+data:
+  key: value

@@ -22,6 +22,7 @@ export type K8sResource = z.infer<typeof K8sResourceSchema>;
  * Resource diff schema
  */
 export const ResourceDiffSchema = z.object({
+  namespace: z.string(),
   kind: z.string(),
   name: z.string(),
   type: z.union([
