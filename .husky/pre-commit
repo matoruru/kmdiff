@@ -3,3 +3,4 @@
 
 bun run check
 npx lint-staged
+bun test
