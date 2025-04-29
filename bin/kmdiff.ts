@@ -39,6 +39,11 @@ const prog = sade('kmdiff [oldFile] [newFile]')
       } else {
         console.log(formatMarkdown(diffResult));
       }
+
+      // Exit with 1 if there are any diffs
+      if (diffResult.length > 0) {
+        process.exit(1);
+      }
     } catch (err) {
       console.error(`Failed to read or parse files: ${err instanceof Error ? err.message : String(err)}`);
       process.exit(1);
