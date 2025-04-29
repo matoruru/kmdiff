@@ -55,26 +55,27 @@ describe('kmdiff CLI', () => {
       const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
       const stdout = proc.stdout.toString('utf8');
 
-      const diffBlocks = stdout.match(/```diff[\s\S]*?```/);
+      const diffBlocks = stdout.match(/  ```diff[\s\S]*?  ```/);
       if (!diffBlocks) {
         throw new Error('No diff blocks found');
       }
 
-      // This test defines how the diff block should look like:
+      // This test defines how the diff block should look like.
+      // Indentation is important because it looks cleaner in Markdown.
       const expectedDiffBlock = `
-\`\`\`diff
- apiVersion: v1
- data:
--  key: old-value
-+  key: new-value
- kind: ConfigMap
- metadata:
-   labels:
--    app: my-app
-+    app: my-app2
-   name: my-config
-   namespace: default
-\`\`\``.replace(/^\n/, '');
+  \`\`\`diff
+   apiVersion: v1
+   data:
+  -  key: old-value
+  +  key: new-value
+   kind: ConfigMap
+   metadata:
+     labels:
+  -    app: my-app
+  +    app: my-app2
+     name: my-config
+     namespace: default
+  \`\`\``.replace(/^\n/, '');
 
       expect(diffBlocks[0]).toBe(expectedDiffBlock);
     });
