@@ -279,7 +279,7 @@ describe('diffResources', () => {
       }
 
       const diffText = result[0]?.diffs[0]?.diffText;
-      expect(diffText).toContain('\n    myarray:\n-     - a\n      - b\n      - c\n+     - a');
+      expect(diffText).toContain('\n   myarray:\n-    - a\n     - b\n     - c\n+    - a');
     });
   });
 });

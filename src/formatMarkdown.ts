@@ -3,7 +3,7 @@ import type { DiffResult } from './types';
 const formatResourceItem = (res: { type: string; name: string; diffText?: string }): string => {
   const header = `- ${capitalize(res.type)}: ${res.name}`;
   if (res.type === 'modified' && res.diffText) {
-    return `${header}\n\n\`\`\`diff\n${res.diffText.trim()}\n\`\`\``;
+    return `${header}\n\n\`\`\`diff\n${res.diffText}\n\`\`\``;
   }
   return header;
 };

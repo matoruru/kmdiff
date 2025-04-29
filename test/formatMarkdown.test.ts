@@ -4,15 +4,18 @@ import type { DiffResult } from '../src/types';
 
 describe('formatMarkdown', () => {
   it('should format DiffResult into a well-structured Markdown summary with proper sections and diff blocks', () => {
+
+    // This is a diffText format. Not a diff block's content.
+    // So, DO NOT refer this as a Markdown output.
     const diffText = `
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: your-config
-  namespace: default
-  labels:
--     app: my-app
-+     app: my-app2
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: your-config
+   namespace: default
+   labels:
+-      app: my-app
++      app: my-app2
   data:
 -   key: old-value
 +   key: new-value`.replace(/^\n/, '');

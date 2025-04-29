@@ -92,7 +92,7 @@ const generateDiffText = (oldYaml: string, newYaml: string): string => {
       return part.value
         .split('\n')
         .filter(line => line.length > 0)
-        .map(line => `${prefix} ${line}`)
+        .map(line => `${prefix}${line}`)
         .join('\n');
     })
     .join('\n');
