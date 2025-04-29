@@ -5,14 +5,14 @@ import sade from 'sade';
  * Based on https://github.com/lukeed/sade/blob/8aa4a69e95fbfba88cf49082713900ecbe27f183/src/index.js#L46
  */
 export const getSadeOptions = (prog: sade.Sade): [string, string][] => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tree = (prog as any).tree;
   return tree.__all__.options;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getUnknownOptions = (prog: sade.Sade, opts: Record<string, any>): string[] => {
-  const allowed = new Set(
-    getSadeOptions(prog).map(([flag]) => flag.replace(/^--/, ''))
-  );
+  const allowed = new Set(getSadeOptions(prog).map(([flag]) => flag.replace(/^--/, '')));
 
   return Object.keys(opts)
     .filter((key) => key !== '_')

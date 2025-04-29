@@ -16,7 +16,7 @@ const getNamespace = (resource: K8sResource): string => {
  * Create a Map from an array of K8sResource, keyed by namespace/kind/name.
  */
 export const createResourceMap = (resources: K8sResource[]): Map<string, K8sResource> => {
-  return new Map(resources.map(res => [getResourceKey(res), res]));
+  return new Map(resources.map((res) => [getResourceKey(res), res]));
 };
 
 /**
@@ -91,8 +91,8 @@ const generateDiffText = (oldYaml: string, newYaml: string): string => {
       const prefix = part.added ? '+' : part.removed ? '-' : ' ';
       return part.value
         .split('\n')
-        .filter(line => line.length > 0)
-        .map(line => `${prefix}${line}`)
+        .filter((line) => line.length > 0)
+        .map((line) => `${prefix}${line}`)
         .join('\n');
     })
     .join('\n');

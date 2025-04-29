@@ -7,14 +7,28 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "prepare": "husky install",
     "test": "bun test",
-    "start": "bun src/cli.ts"
+    "start": "bun src/cli.ts",
+    "lint": "bunx eslint . --ext .ts",
+    "format": "bunx prettier --check .",
+    "typecheck": "bunx tsc --noEmit",
+    "check": "bun run lint && bun run format && bun run typecheck"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@types/bun": "latest",
     "@types/diff": "^7.0.2",
     "@types/sade": "^1.8.0",
-    "typescript": "^5"
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "typescript": "^5"

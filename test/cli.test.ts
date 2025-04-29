@@ -7,12 +7,18 @@ describe('kmdiff CLI', () => {
 
   describe('Exit Code', () => {
     it('returns 0 when no diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`
+          .nothrow()
+          .quiet();
       expect(proc.exitCode).toBe(0);
     });
 
     it('returns 1 when diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`
+          .nothrow()
+          .quiet();
       expect(proc.exitCode).toBe(1);
     });
   });
@@ -106,7 +112,10 @@ describe('kmdiff CLI', () => {
     });
 
     it('shows usage message when unknown option is given', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml --unknown`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml --unknown`
+          .nothrow()
+          .quiet();
       const stdout = proc.stdout.toString('utf8');
 
       expect(stdout).toContain('Description');
@@ -119,7 +128,10 @@ describe('kmdiff CLI', () => {
 
   describe('Banner Display', () => {
     it('shows banner when diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`
+          .nothrow()
+          .quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
@@ -127,7 +139,10 @@ describe('kmdiff CLI', () => {
     });
 
     it('shows banner when no diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`
+          .nothrow()
+          .quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
@@ -135,7 +150,10 @@ describe('kmdiff CLI', () => {
     });
 
     it('shows banner even when file read error occurs', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/nonexistent-old.yaml test/fixtures/nonexistent-new.yaml`.nothrow().quiet();
+      const proc =
+        await $`bun ${cliPath} test/fixtures/nonexistent-old.yaml test/fixtures/nonexistent-new.yaml`
+          .nothrow()
+          .quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.

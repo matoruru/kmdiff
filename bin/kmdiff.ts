@@ -6,7 +6,7 @@ import { diffResources } from '../src/diff';
 import { formatMarkdown } from '../src/formatMarkdown';
 import * as fs from 'fs/promises';
 import { printBanner } from '../src/banner';
-import { parseYaml } from '../src/utils';
+import { parseYaml, printMessage } from '../src/utils';
 import { getUnknownOptions } from '../src/hack/sade-internals';
 
 const prog = sade('kmdiff [oldFile] [newFile]')
@@ -18,7 +18,7 @@ const prog = sade('kmdiff [oldFile] [newFile]')
   .action(async (oldFile, newFile, opts) => {
     const unknownOptions = getUnknownOptions(prog, opts);
 
-    if ((!oldFile || !newFile) || unknownOptions.length > 0) {
+    if (!oldFile || !newFile || unknownOptions.length > 0) {
       prog.help();
       process.exit(1);
     }
@@ -35,9 +35,9 @@ const prog = sade('kmdiff [oldFile] [newFile]')
       const diffResult = diffResources(oldResources, newResources);
 
       if (opts.json) {
-        console.log(JSON.stringify(diffResult, null, 2));
+        printMessage(JSON.stringify(diffResult, null, 2));
       } else {
-        console.log(formatMarkdown(diffResult));
+        printMessage(formatMarkdown(diffResult));
       }
 
       // Exit with 1 if there are any diffs
@@ -45,7 +45,9 @@ const prog = sade('kmdiff [oldFile] [newFile]')
         process.exit(1);
       }
     } catch (err) {
-      console.error(`Failed to read or parse files: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(
+        `Failed to read or parse files: ${err instanceof Error ? err.message : String(err)}`
+      );
       process.exit(1);
     }
   });

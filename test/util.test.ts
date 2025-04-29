@@ -28,7 +28,7 @@ data:
             app: 'my-app',
           },
           annotations: {
-            "my-annotation": 'my-value',
+            'my-annotation': 'my-value',
           },
         },
         data: {

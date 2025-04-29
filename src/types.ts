@@ -2,19 +2,23 @@ import { z } from 'zod';
 
 /**
  * Kubernetes resource schema
- * 
+ *
  * NOTE: .passthrough() is used because Kubernetes resources can have arbitrary additional fields
  * (e.g., spec, data, status, template, etc.), and we want to allow those extensions
  * without having to enumerate all possible properties here.
  */
-export const K8sResourceSchema = z.object({
-  apiVersion: z.string(),
-  kind: z.string(),
-  metadata: z.object({
-    name: z.string(),
-    namespace: z.string().optional(),
-  }).passthrough(),
-}).passthrough();
+export const K8sResourceSchema = z
+  .object({
+    apiVersion: z.string(),
+    kind: z.string(),
+    metadata: z
+      .object({
+        name: z.string(),
+        namespace: z.string().optional(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
 
 export type K8sResource = z.infer<typeof K8sResourceSchema>;
 
