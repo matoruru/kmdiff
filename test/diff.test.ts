@@ -172,5 +172,110 @@ describe('diffResources', () => {
       },
     ]);
   });
+});
 
+describe('diffResources - order insensitive', () => {
+  it('should NOT detect diff when only property order differs', () => {
+    const oldResources: K8sResource[] = [
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: {
+          name: 'my-config',
+          namespace: 'ns1',
+        },
+        data: {
+          key1: 'value1',
+          key2: 'value2',
+        },
+      },
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: {
+          name: 'my-config',
+          namespace: 'default',
+        },
+        data: {
+          key1: 'value1',
+          key2: 'value2',
+        },
+      },
+    ];
+
+    const newResources: K8sResource[] = [
+      {
+        metadata: {
+          namespace: 'default',
+          name: 'my-config',
+        },
+        apiVersion: 'v1',
+        data: {
+          key2: 'value2',
+          key1: 'value1',
+        },
+        kind: 'ConfigMap',
+      },
+      {
+        metadata: {
+          name: 'my-config',
+          namespace: 'ns1',
+        },
+        kind: 'ConfigMap',
+        apiVersion: 'v1',
+        data: {
+          key1: 'value1',
+          key2: 'value2',
+        },
+      },
+    ];
+
+    // should compare after sorting by namespace, kind, and name
+    const result = diffResources(oldResources, newResources);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should detect diff when array order differs', () => {
+    const oldResources: K8sResource[] = [
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: {
+          name: 'my-config',
+          namespace: 'default',
+        },
+        data: {
+          key1: 'value1',
+          key2: 'value2',
+          myarray: ['a', 'b', 'c'],
+        },
+      },
+    ];
+
+    const newResources: K8sResource[] = [
+      {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: {
+          name: 'my-config',
+          namespace: 'default',
+        },
+        data: {
+          key1: 'value1',
+          key2: 'value2',
+          myarray: ['b', 'c', 'a'],
+        },
+      },
+    ];
+
+    const result = diffResources(oldResources, newResources);
+
+    if (result[0]?.diffs[0]?.type !== 'modified') {
+      throw new Error('modified resource was expected here.');
+    }
+
+    const diffText = result[0]?.diffs[0]?.diffText;
+    expect(diffText).toContain('\n    myarray:\n-     - a\n      - b\n      - c\n+     - a');
+  });
 });

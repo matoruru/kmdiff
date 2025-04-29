@@ -1,6 +1,7 @@
 import type { K8sResource, DiffResult, ResourceDiff } from './types';
 import { diffLines } from 'diff';
 import * as YAML from 'yaml';
+import { sortKeysDeep } from './utils';
 
 /**
  * Safely get namespace from a K8sResource, defaulting to 'default' if missing.
@@ -50,8 +51,8 @@ const handleAddedResource = (resource: K8sResource, namespaceMap: Map<string, Re
  * Handle a modified resource
  */
 const handleModifiedResource = (oldRes: K8sResource, newRes: K8sResource, namespaceMap: Map<string, ResourceDiff[]>) => {
-  const oldYaml = YAML.stringify(oldRes);
-  const newYaml = YAML.stringify(newRes);
+  const oldYaml = YAML.stringify(sortKeysDeep(oldRes));
+  const newYaml = YAML.stringify(sortKeysDeep(newRes));
 
   if (oldYaml === newYaml) return;
 

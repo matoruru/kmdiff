@@ -11,3 +11,20 @@ export const parseYaml = (content: string) => {
   const resources = K8sResourceSchema.array().parse(docs);
   return resources;
 };
+
+/**
+ * Recursively sort object keys alphabetically
+ */
+export const sortKeysDeep = (obj: unknown): unknown => {
+  if (Array.isArray(obj)) {
+    return obj.map(sortKeysDeep);
+  } else if (obj && typeof obj === 'object') {
+    return Object.keys(obj)
+      .sort()
+      .reduce((acc, key) => {
+        (acc as Record<string, unknown>)[key] = sortKeysDeep((obj as Record<string, unknown>)[key]);
+        return acc;
+      }, {} as Record<string, unknown>);
+  }
+  return obj;
+};
