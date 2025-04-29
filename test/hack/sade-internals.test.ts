@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'bun:test';
 import sade from 'sade';
 import { getSadeOptions } from '../../src/hack/sade-internals';
+
 describe('Sade internal structure', () => {
   it('tree.__all__.options should exist and have correct format', () => {
     const prog = sade('kmdiff [oldFile] [newFile]')
