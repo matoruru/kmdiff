@@ -3,7 +3,7 @@ import { formatMarkdown } from '../src/formatMarkdown';
 import type { DiffResult } from '../src/types';
 
 describe('formatMarkdown', () => {
-  it('formats DiffResult into Markdown summary', () => {
+  it('should format DiffResult into a well-structured Markdown summary with proper sections and diff blocks', () => {
     const diffText = `
 apiVersion: v1
 kind: ConfigMap

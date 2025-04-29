@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { parseYaml } from '../src/utils';
 
 describe('parseYaml', () => {
-  it('does NOT eliminate properties that are not defined in the schema', () => {
+  it('should preserve all properties including those not defined in the schema', () => {
     const content = `
 apiVersion: v1
 kind: ConfigMap
