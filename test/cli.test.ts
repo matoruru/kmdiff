@@ -5,12 +5,24 @@ import * as path from 'path';
 describe('kmdiff CLI', () => {
   const cliPath = path.resolve(__dirname, '../bin/kmdiff.ts');
 
+  describe('Exit Code', () => {
+    it('returns 0 when no diffs exist', async () => {
+      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.nothrow().quiet();
+      expect(proc.exitCode).toBe(0);
+    });
+
+    it('returns 1 when diffs exist', async () => {
+      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.nothrow().quiet();
+      expect(proc.exitCode).toBe(1);
+    });
+  });
+
   describe('Diff Output', () => {
     it('prints correct diff when resources are changed, added, and removed', async () => {
       const oldYaml = path.resolve(__dirname, 'fixtures/change-add-remove-old.yaml');
       const newYaml = path.resolve(__dirname, 'fixtures/change-add-remove-new.yaml');
 
-      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
+      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       expect(stdout).toContain('# Namespace: default');
@@ -23,7 +35,7 @@ describe('kmdiff CLI', () => {
       const oldYaml = path.resolve(__dirname, 'fixtures/identical-old.yaml');
       const newYaml = path.resolve(__dirname, 'fixtures/identical-new.yaml');
 
-      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
+      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Should not contain any diff items
@@ -36,7 +48,7 @@ describe('kmdiff CLI', () => {
       const oldYaml = path.resolve(__dirname, 'fixtures/namespace-diff-old.yaml');
       const newYaml = path.resolve(__dirname, 'fixtures/namespace-diff-new.yaml');
 
-      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
+      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Should treat namespace difference as two separate resources
@@ -52,7 +64,7 @@ describe('kmdiff CLI', () => {
       const oldYaml = path.resolve(__dirname, 'fixtures/simple-old.yaml');
       const newYaml = path.resolve(__dirname, 'fixtures/simple-new.yaml');
 
-      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
+      const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       const diffBlocks = stdout.match(/  ```diff[\s\S]*?  ```/);
@@ -107,7 +119,7 @@ describe('kmdiff CLI', () => {
 
   describe('Banner Display', () => {
     it('shows banner when diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.quiet();
+      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-new.yaml`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
@@ -115,7 +127,7 @@ describe('kmdiff CLI', () => {
     });
 
     it('shows banner when no diffs exist', async () => {
-      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.quiet();
+      const proc = await $`bun ${cliPath} test/fixtures/simple-old.yaml test/fixtures/simple-old.yaml`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.
@@ -131,7 +143,7 @@ describe('kmdiff CLI', () => {
     });
 
     it('does not print banner when --help is called', async () => {
-      const proc = await $`bun ${cliPath} --help`.quiet();
+      const proc = await $`bun ${cliPath} --help`.nothrow().quiet();
       const stdout = proc.stdout.toString('utf8');
 
       // Why not confirming the whole banner?: Because that makes test fragile by any changes in the banner.

@@ -9,7 +9,7 @@ describe('kmdiff CLI - Large Manifest Comparison', () => {
     const oldYaml = path.resolve(__dirname, 'fixtures/large-old.yaml');
     const newYaml = path.resolve(__dirname, 'fixtures/large-new.yaml');
 
-    const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.quiet();
+    const proc = await $`bun ${cliPath} ${oldYaml} ${newYaml}`.nothrow().quiet();
     const stdout = proc.stdout.toString('utf8');
 
     // Check namespace header
