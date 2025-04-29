@@ -1,0 +1,138 @@
+# Deployment: frontend (modified)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: staging
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 4 # replicas changed
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: nginx
+
+---
+# Deployment: backend (modified)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: staging
+spec:
+  replicas: 3 # replicas changed
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: my-backend:v2 # image changed
+
+---
+# Service: frontend (modified)
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: staging
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 443 # new port added
+
+---
+# Service: backend (no change except property order)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: staging
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: backend
+
+---
+# Ingress: app-ingress (modified path)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: staging
+  name: app-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /app # path changed
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+      host: app.example.com
+
+---
+# PodDisruptionBudget: backend-pdb (modified)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: staging
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  minAvailable: 2 # minAvailable changed
+
+---
+# ConfigMap: app-config (key added)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: staging
+  name: app-config
+data:
+  ENV: production
+  DEBUG: "true" # new key added
+
+---
+# New Deployment: cache (new)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: staging
+  name: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      containers:
+        - name: cache
+          image: redis

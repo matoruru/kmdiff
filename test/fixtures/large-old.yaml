@@ -1,0 +1,149 @@
+# Deployment: frontend (old)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: staging
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: nginx
+
+---
+# Deployment: backend (old)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: my-backend:v1
+
+---
+# Deployment: worker (old)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: my-worker:v1
+
+---
+# Service: frontend (old)
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: staging
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: frontend
+
+---
+# Service: backend (old)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: staging
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+
+---
+# Service: worker (old)
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker
+  namespace: staging
+spec:
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: worker
+
+---
+# Ingress: app-ingress (old)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: staging
+spec:
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+
+---
+# PodDisruptionBudget: backend-pdb (old)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: staging
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: backend
+
+---
+# ConfigMap: app-config (old)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: staging
+data:
+  ENV: production
