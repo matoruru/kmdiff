@@ -16,15 +16,18 @@ export const parseYaml = (content: string) => {
  * Recursively sort object keys alphabetically
  */
 export const sortKeysDeep = (obj: unknown): unknown => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
   if (Array.isArray(obj)) {
     return obj.map(sortKeysDeep);
-  } else if (obj && typeof obj === 'object') {
-    return Object.keys(obj)
-      .sort()
-      .reduce((acc, key) => {
-        (acc as Record<string, unknown>)[key] = sortKeysDeep((obj as Record<string, unknown>)[key]);
-        return acc;
-      }, {} as Record<string, unknown>);
   }
-  return obj;
+
+  return Object.keys(obj)
+    .sort()
+    .reduce((acc: Record<string, unknown>, key: string) => {
+      acc[key] = sortKeysDeep((obj as Record<string, unknown>)[key]);
+      return acc;
+    }, {});
 };

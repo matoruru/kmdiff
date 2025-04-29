@@ -1,6 +1,8 @@
-import type { K8sResource, DiffResult, ResourceDiff } from './types';
 import { diffLines } from 'diff';
+import type { Change } from 'diff';
 import * as YAML from 'yaml';
+
+import type { K8sResource, DiffResult, ResourceDiff } from './types';
 import { sortKeysDeep } from './utils';
 
 /**
@@ -14,13 +16,16 @@ const getNamespace = (resource: K8sResource): string => {
  * Create a Map from an array of K8sResource, keyed by namespace/kind/name.
  */
 export const createResourceMap = (resources: K8sResource[]): Map<string, K8sResource> => {
-  return new Map(resources.map((res) => [getResourceKey(res), res]));
+  return new Map(resources.map(res => [getResourceKey(res), res]));
 };
 
 /**
  * Handle a removed resource
  */
-const handleRemovedResource = (resource: K8sResource, namespaceMap: Map<string, ResourceDiff[]>) => {
+const handleRemovedResource = (
+  resource: K8sResource,
+  namespaceMap: Map<string, ResourceDiff[]>
+): void => {
   const ns = getNamespace(resource);
   namespaceMap.set(ns, [
     ...(namespaceMap.get(ns) ?? []),
@@ -28,14 +33,17 @@ const handleRemovedResource = (resource: K8sResource, namespaceMap: Map<string, 
       kind: resource.kind,
       name: resource.metadata.name,
       type: 'removed',
-    }
+    },
   ]);
 };
 
 /**
  * Handle an added resource
  */
-const handleAddedResource = (resource: K8sResource, namespaceMap: Map<string, ResourceDiff[]>) => {
+const handleAddedResource = (
+  resource: K8sResource,
+  namespaceMap: Map<string, ResourceDiff[]>
+): void => {
   const ns = getNamespace(resource);
   namespaceMap.set(ns, [
     ...(namespaceMap.get(ns) ?? []),
@@ -43,14 +51,18 @@ const handleAddedResource = (resource: K8sResource, namespaceMap: Map<string, Re
       kind: resource.kind,
       name: resource.metadata.name,
       type: 'added',
-    }
+    },
   ]);
 };
 
 /**
  * Handle a modified resource
  */
-const handleModifiedResource = (oldRes: K8sResource, newRes: K8sResource, namespaceMap: Map<string, ResourceDiff[]>) => {
+const handleModifiedResource = (
+  oldRes: K8sResource,
+  newRes: K8sResource,
+  namespaceMap: Map<string, ResourceDiff[]>
+): void => {
   const oldYaml = YAML.stringify(sortKeysDeep(oldRes));
   const newYaml = YAML.stringify(sortKeysDeep(newRes));
 
@@ -66,7 +78,7 @@ const handleModifiedResource = (oldRes: K8sResource, newRes: K8sResource, namesp
       name: newRes.metadata.name,
       type: 'modified',
       diffText,
-    }
+    },
   ]);
 };
 
@@ -75,7 +87,7 @@ const handleModifiedResource = (oldRes: K8sResource, newRes: K8sResource, namesp
  */
 const generateDiffText = (oldYaml: string, newYaml: string): string => {
   return diffLines(oldYaml, newYaml)
-    .map((part) => {
+    .map((part: Change) => {
       const prefix = part.added ? '+' : part.removed ? '-' : ' ';
       return part.value
         .split('\n')
@@ -89,7 +101,10 @@ const generateDiffText = (oldYaml: string, newYaml: string): string => {
 /**
  * Main diff generation function
  */
-export const generateResourceDiff = (oldMap: Map<string, K8sResource>, newMap: Map<string, K8sResource>): DiffResult => {
+export const generateResourceDiff = (
+  oldMap: Map<string, K8sResource>,
+  newMap: Map<string, K8sResource>
+): DiffResult => {
   const allKeys = new Set([...oldMap.keys(), ...newMap.keys()]);
   const namespaceMap = new Map<string, ResourceDiff[]>();
 
@@ -122,19 +137,20 @@ export const sortDiffResult = (diffResult: DiffResult): DiffResult => {
     .sort((a, b) => a.namespace.localeCompare(b.namespace))
     .map(({ namespace, diffs }) => ({
       namespace,
-      diffs: diffs
-        .slice()
-        .sort((a, b) => {
-          if (a.kind !== b.kind) return a.kind.localeCompare(b.kind);
-          return a.name.localeCompare(b.name);
-        }),
+      diffs: diffs.slice().sort((a, b) => {
+        if (a.kind !== b.kind) return a.kind.localeCompare(b.kind);
+        return a.name.localeCompare(b.name);
+      }),
     }));
 };
 
 /**
  * Main function to generate sorted diff results from old and new resource arrays.
  */
-export const diffResources = (oldResources: K8sResource[], newResources: K8sResource[]): DiffResult => {
+export const diffResources = (
+  oldResources: K8sResource[],
+  newResources: K8sResource[]
+): DiffResult => {
   const oldMap = createResourceMap(oldResources);
   const newMap = createResourceMap(newResources);
 
