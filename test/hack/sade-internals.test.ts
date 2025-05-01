@@ -14,8 +14,8 @@ describe('Sade internal structure', () => {
     const prog = sade('kmdiff [oldFile] [newFile]')
       .option('--json', 'Output diff in JSON format')
       .action(async (oldFile, newFile, opts) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        expect((opts as any)._).toEqual([]);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(opts._).toEqual([]);
       });
 
     prog.parse(['--json']);

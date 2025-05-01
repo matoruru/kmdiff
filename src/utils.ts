@@ -1,9 +1,9 @@
-import { K8sResourceSchema } from './types';
+import { type K8sResource, K8sResourceSchema } from './types';
 import * as YAML from 'yaml';
 /**
  * Parse YAML content into K8sResource array
  */
-export const parseYaml = (content: string) => {
+export const parseYaml = (content: string): K8sResource[] => {
   const docs = content
     .split(/^---\s*$/gm)
     .map((doc) => doc.trim())
@@ -33,7 +33,7 @@ export const sortKeysDeep = (obj: unknown): unknown => {
     }, {});
 };
 
-export const printMessage = (message: string) => {
+export const printMessage = (message: string): void => {
   // eslint-disable-next-line no-console
   console.log(message);
 };

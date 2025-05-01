@@ -1,6 +1,9 @@
 /** @type {import('lint-staged').Config} */
 const config = {
-  '**/*.ts': ['bunx eslint --fix', 'bunx prettier --write'],
+  '**/*.ts': [
+    'bun run lint --fix',
+    'bun run format --write',
+  ],
 };
 
 export default config;

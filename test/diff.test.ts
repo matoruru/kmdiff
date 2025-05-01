@@ -109,7 +109,8 @@ describe('diffResources', () => {
               kind: 'ConfigMap',
               name: 'my-config',
               type: 'modified',
-              diffText: expect.any(String),
+              diffText:
+                ' apiVersion: v1\n data:\n-  key: old-value\n+  key: new-value\n kind: ConfigMap\n metadata:\n   name: my-config\n   namespace: default',
             },
           ],
         },
@@ -119,7 +120,7 @@ describe('diffResources', () => {
         throw new Error('modified resource was expected here.');
       }
 
-      const diffText = result[0]?.diffs[0]?.diffText;
+      const diffText = result[0].diffs[0].diffText;
       expect(diffText).toBeDefined();
       expect(diffText).not.toEqual('');
       expect(diffText).toContain('key');
@@ -276,7 +277,7 @@ describe('diffResources', () => {
         throw new Error('modified resource was expected here.');
       }
 
-      const diffText = result[0]?.diffs[0]?.diffText;
+      const diffText = result[0].diffs[0].diffText;
       expect(diffText).toContain('\n   myarray:\n-    - a\n     - b\n     - c\n+    - a');
     });
   });

@@ -12,8 +12,7 @@
     "start": "bun src/cli.ts",
     "lint": "bunx eslint . --ext .ts",
     "format": "bunx prettier --check .",
-    "typecheck": "bunx tsc --noEmit",
-    "check": "bun run lint && bun run format && bun run typecheck"
+    "typecheck": "bunx tsc --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",

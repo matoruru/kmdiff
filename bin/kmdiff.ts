@@ -7,7 +7,7 @@ import { formatMarkdown } from '../src/formatMarkdown';
 import * as fs from 'fs/promises';
 import { printBanner } from '../src/banner';
 import { parseYaml, printMessage } from '../src/utils';
-import { getUnknownOptions } from '../src/hack/sade-internals';
+import { getUnknownOptions, SadeUserDefinedOptionsSchema } from '../src/hack/sade-internals';
 
 const prog = sade('kmdiff [oldFile] [newFile]')
   .version(pkg.version)
@@ -16,9 +16,10 @@ const prog = sade('kmdiff [oldFile] [newFile]')
   .example('kmdiff old.yaml new.yaml')
   .example('kmdiff old.yaml new.yaml --json')
   .action(async (oldFile, newFile, opts) => {
-    const unknownOptions = getUnknownOptions(prog, opts);
+    const userDefinedOptions = SadeUserDefinedOptionsSchema.parse(opts);
+    const unknownOptions = getUnknownOptions(prog, userDefinedOptions);
 
-    if (!oldFile || !newFile || unknownOptions.length > 0) {
+    if (typeof oldFile !== 'string' || typeof newFile !== 'string' || unknownOptions.length > 0) {
       prog.help();
       process.exit(1);
     }
@@ -34,7 +35,7 @@ const prog = sade('kmdiff [oldFile] [newFile]')
 
       const diffResult = diffResources(oldResources, newResources);
 
-      if (opts.json) {
+      if (userDefinedOptions.json === true) {
         printMessage(JSON.stringify(diffResult, null, 2));
       } else {
         printMessage(formatMarkdown(diffResult));
